@@ -54,6 +54,15 @@ var engine = caramel.engine('handlebars', (function() {
                 partials(new File(defaultExtensionPartialsPath));
             }
             partials(new File(theme.resolve('partials')));
+
+            //MODIF
+            Handlebars.registerHelper('traduction', function(text) {
+                var i18n = require("i18n");
+                i18n.init(request);
+                return i18n.localize(text, "cannot be translated by jaggery");
+            });
+
+
             Handlebars.registerHelper('dyn', function(options) {
                 var asset = options.hash.asset,
                     resolve = function(path) {
