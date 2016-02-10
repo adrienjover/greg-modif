@@ -60,7 +60,7 @@ var engine = caramel.engine('handlebars', (function() {
                 i18n.init(request);
                 return i18n.localize(text, "cannot be translated by jaggery");
             });
-            
+
             Handlebars.registerHelper('dyn', function(options) {
                 var asset = options.hash.asset,
                     resolve = function(path) {
