@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+<htd:humanInteractions
+        xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803"
+        xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:cl="http://wso2.org/worklist/"
+        xmlns:tns="http://wso2.org"
+        targetNamespace="http://wso2.org"
+        xmlns:test10="http://wso2.org/worklist/schema"
+        xsi:schemaLocation="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803 ../../xml/ws-humantask.xsd">
+
+    <htd:documentation>
+        Humatask for Work List in WSO2 Carbon
+    </htd:documentation>
+
+    <htd:import importType="http://schemas.xmlsoap.org/wsdl/"
+                location="sample.wsdl"
+                namespace="http://wso2.org/worklist/"/>
+
+    <htd:logicalPeopleGroups>
+        <htd:logicalPeopleGroup name="approver">
+            <htd:documentation xml:lang="en-US">
+                The role to which the task was assigned
+            </htd:documentation>
+            <htd:parameter name="role" type="xsd:string"/>
+        </htd:logicalPeopleGroup>
+    </htd:logicalPeopleGroups>
+
+
+    <htd:tasks>
+        <htd:task name="AddTask">
+            <htd:documentation xml:lang="en-US">
+                This is used to create a task (work item).
+            </htd:documentation>
+
+            <htd:interface portType="cl:WorkListPT"
+                           operation="addTask"
+                           responsePortType="cl:WorkListCallbackPT"
+                           responseOperation="addTaskResponse"/>
+
+            <htd:priority>
+                htd:getInput("WorkRequest")/test10:priority
+            </htd:priority>
+
+            <htd:peopleAssignments>
+                <htd:potentialOwners>
+                    <htd:from logicalPeopleGroup="approver">
+                        <htd:argument name="role">
+                            htd:getInput("WorkRequest")/test10:role
+                        </htd:argument>
+                    </htd:from>
+                </htd:potentialOwners>
+            </htd:peopleAssignments>
+
+            <htd:delegation potentialDelegatees="nobody"/>
+
+            <htd:presentationElements>
+                <htd:name xml:lang="en-US">Work Item</htd:name>
+                <htd:presentationParameters>
+                    <htd:presentationParameter name="description"
+                                               type="xsd:string">
+                        htd:getInput("WorkRequest")/test10:description
+                    </htd:presentationParameter>
+                </htd:presentationParameters>
+
+                <htd:subject xml:lang="en-US">
+                    $description$
+                </htd:subject>
+                <htd:description xml:lang="en-US" contentType="text/plain">
+                    $description$
+                </htd:description>
+                <htd:description xml:lang="en-US" contentType="text/html">
+                    <![CDATA[
+          <p>
+            $description$
+          </p>
+          ]]>
+                </htd:description>
+            </htd:presentationElements>
+
+            <htd:deadlines/>
+        </htd:task>
+    </htd:tasks>
+    <htd:notifications/>
+</htd:humanInteractions>
