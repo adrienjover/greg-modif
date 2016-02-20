@@ -1,0 +1,18 @@
+{
+"greetings.local": "FranÃ§ais - DÃ©mo de l10n.js", 
+"info.local": "Vous lisez une localisation en franÃ§ais de cette page.",
+"Tags": "Tags",
+"Make this the default": "Mettre par deffaut",
+"search" : "rechercher",
+"Advanced Search" : "Recherche avancée",
+"Do you want to delete this asset?" : "Voulez-vous supprimer cet asset?",
+"Delete" : "Supprimer",
+"Cancel" : "Annuler",
+"Sign out" : "Déconnexion",
+"Go to Store" : "Aller au Store",
+"My Popular Assets" : "Mes assets favoris",
+"Hot Assets" : "Assets urgent",
+"Reset" : "Effacer",
+"Create new version" : "Creer une nouvelle version",
+"This comment will be recored with the state transition" : "Ce commentaire sera recouvert par l'état de transition"
+}
