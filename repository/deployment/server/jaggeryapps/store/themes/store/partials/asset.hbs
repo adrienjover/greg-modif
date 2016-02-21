@@ -25,8 +25,8 @@
                 <div class="details-container">
                     <div class="pull-left">
                         <h4 class="margin-none ">{{overview_name}}</h4>
-                        <p class="grey padding-none margin-none">{{t "Version"}} {{overview_version}}</p>
-                        <p class="light-blue padding-none margin-none">{{t "by"}} {{overview_provider}}</p>
+                        <p class="grey padding-none margin-none">{{traduction "Version"}} {{overview_version}}</p>
+                        <p class="light-blue padding-none margin-none">{{traduction "by"}} {{overview_provider}}</p>
                     </div>
                     <div class="pull-right">
                         <span class = "pull-right rating-count"> ( <i class="fa fa-users"></i> {{../count}} )</span>
@@ -58,15 +58,15 @@
                     <hr class="margin-bottom-double">
                     <ul class="nav nav-tabs" id="assetp-tabs" data-aid="{{../path}}">
                         <li class="active">
-                            <a href="#tab-properties" data-toggle="tab" data-type="basic">{{t "Description"}}</a>
+                            <a href="#tab-properties" data-toggle="tab" data-type="basic">{{traduction "Description"}}</a>
                         </li>
                         {{#hasAssetPermission . key="ASSET_REVIEWS" type=../../rxt.shortName username=../../cuser.username tenantId=../../cuser.tenantId}}
                         <li>
-                            <a href="#tab-reviews" data-toggle="tab" data-type="comments">{{t "User Reviews"}}</a>
+                            <a href="#tab-reviews" data-toggle="tab" data-type="comments">{{traduction "User Reviews"}}</a>
                         </li>
                         {{/hasAssetPermission}}
                         <li>
-                            <a href="#tab-share" data-toggle="tab" data-type="basic">{{t "Share"}}</a>
+                            <a href="#tab-share" data-toggle="tab" data-type="basic">{{traduction "Share"}}</a>
                         </li>
                     </ul>
                     <div class="tab-content">

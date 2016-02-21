@@ -844,7 +844,9 @@ function showRelations(d){
 /*
  * Function to save current screen as a .png image file.
  */
-function svgDownload(){
+ //MODIF
+ //svgDownload en commentaire le temps de trouver comment mettre un bouton dans l'interface
+/*function svgDownload(){
     $(graphSVG).clone().appendTo("#graph-capture");
     $(graphCaptureSVG).attr("id","cloned");
     var cssRules = {
@@ -864,8 +866,43 @@ function svgDownload(){
     $(graphCaptureSVG + " g").inlineStyler(cssRules);
     svgenie.save(document.getElementById("cloned"), { name:"graph.png" });
     $(graphCaptureSVG).remove();
-}
+}*/
+function svgDownload(){
+    console.log("New Download Function started (Adrien)");//TODELETE
+    var graphArray = $( "#mainG" ).find( "g" );//.attr('id');
+    console.log(graphArray);
+    console.log(graphArray[0]);
+    console.log(graphArray[1]);
+    console.log(graphArray[2]);
+    var IDs = [];
+    $( "#mainG" ).find( "g" ).each(function(){ IDs.push(this.id); });
+    for(var i=0; i<IDs.length; i++){
+        console.log(IDs[i]);
+    }
+    var arrayContents = [];
+    for(var i=0; i<IDs.length; i++){
+        //children at index 1 is service name
+        var ressourceName = $( "#"+IDs[i]+"").children()[1].innerHTML;
+        if(ressourceName){
+            console.log(ressourceName);
+            arrayContents.push(ressourceName);
+        }
+        //console.log($( "#"+IDs[i]+"").children()[1].innerHTML);
+    }
 
+    //CSV Generation
+    /*var data = [["name1", "city1", "some other info"], ["name2", "city2", "more info"]];
+    var csvContent = "data:text/csv;charset=utf-8,";
+    arrayContents.forEach(function(infoArray, index){
+
+        dataString = infoArray.join(",");
+        csvContent += index < arrayContents.length ? dataString+ "\n" : dataString;
+
+    }); 
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);*/
+    
+}
 /*
  * Function to get link relations.
  * @param d: data

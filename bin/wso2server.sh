@@ -33,6 +33,9 @@
 # OS specific support.  $var _must_ be set to either true or false.
 #ulimit -n 100000
 
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home;
+export PATH=${JAVA_HOME}/bin:${PATH};
+
 cygwin=false;
 darwin=false;
 os400=false;
