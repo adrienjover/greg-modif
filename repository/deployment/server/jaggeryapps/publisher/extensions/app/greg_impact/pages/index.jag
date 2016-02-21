@@ -188,7 +188,8 @@ else {
 
             update(root) ;
             setupSearch();
-            setupFilters();
+            setupLinkFilters();
+            setupNodeFilters();
 
     </script>
 </body>
