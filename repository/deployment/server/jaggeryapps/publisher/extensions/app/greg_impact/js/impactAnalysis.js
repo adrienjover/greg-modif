@@ -389,7 +389,7 @@ function dragstart(d){
 /*
  * Initializing filtering function.
  */
-function setupFilters(){
+function setupLinkFilters(){
     var filters = [];
 
     d3.selectAll("[group=link]").each(function(){
@@ -405,14 +405,34 @@ function setupFilters(){
     });
 
     for(var i = 0; i < filters.length; i++) {
-        $('#filters').append('<div class="tag" onclick="filter(this)"><span>' +filters[i]+ '</span> <i class="fa fa-check" aria-hidden="true"></i></div><br />');
+        $('#filters').append('<div class="tag" onclick="filterLinks(this)"><span>' +filters[i]+ '</span> <i class="fa fa-check" aria-hidden="true"></i></div><br />');
     }
 }
 
-/* Function to filter resources by it's connected relationships.
+/* 
+ * Initializing filtering function for type of node.
+ */
+function setupNodeFilters(){
+    var filters = [];
+
+    d3.selectAll("[group=node]").each(function(){
+        var elemtype = $(this).children(".media-type").text();
+
+        var newFilter = elemtype;
+        if(filters.indexOf(newFilter) === -1) {
+            filters.push(newFilter)
+        }
+    });
+
+    for(var i = 0; i < filters.length; i++) {
+        $('#filters').append('<div class="tag" onclick="filterNodes(this)"><span>' +filters[i]+ '</span> <i class="fa fa-check" aria-hidden="true"></i></div><br />');
+    }
+}
+
+/* Function to filter links by its type and connected relationships.
  * @param elem: Selected filter tag
  */
-function filter(elem){
+function filterLinks(elem){
 
     $(elem).toggleClass('hidden');
 
@@ -465,6 +485,62 @@ function filter(elem){
 
     });
     
+    clearSearchOperation();
+
+    $("#search").select2("enable", false);
+    $('#filters .tag').each(function(){
+        if(!$(this).hasClass('hidden')){
+            $("#search").select2("enable", true);
+        }
+    });
+
+}
+
+/* 
+ *Function to filter nodes by its type connected relationships.
+ * @param elem: Selected filter tag
+ */
+function filterNodes(elem){
+
+    $(elem).toggleClass('hidden');
+
+    $('i', elem).toggleClass('fa fa-check', function(){
+
+        $("svg").find("[group='node']").hide();
+        $('.tag').each(function(){
+            if(!$(this).hasClass('hidden')) {
+
+                var filter = $('span', this).html();
+                d3.selectAll("[group=node]").each(function(){
+                    var elemtype = $(this).children(".media-type").text();
+                    if (elemtype === filter) {
+                    	$(this).show();
+                    }
+                });
+
+            }
+        });
+
+        $("svg").find("[group='link']").hide();
+        d3.selectAll("[group=link]").each(function(){
+            var nodes = $(this).attr("nodes"),
+                node = nodes.split(';');
+
+            var display = true;                
+            for(var i = 0; i < node.length; i++) {
+                if($("svg").find("#"+node[i]).css('display') == 'none'){
+                    display = false;
+                }
+            }
+
+            if (display) {
+                $(this).show();
+            }
+
+        });
+
+    });
+ 
     clearSearchOperation();
 
     $("#search").select2("enable", false);
