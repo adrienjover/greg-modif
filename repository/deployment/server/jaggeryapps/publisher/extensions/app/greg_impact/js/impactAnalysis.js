@@ -867,28 +867,76 @@ function showRelations(d){
     svgenie.save(document.getElementById("cloned"), { name:"graph.png" });
     $(graphCaptureSVG).remove();
 }*/
+//MODIF Author: Adrien
 function svgDownload(){
-    console.log("New Download Function started (Adrien)");//TODELETE
+    console.log("New Download Function started (Adrie111n)");//TODELETE
     var graphArray = $( "#mainG" ).find( "g" );//.attr('id');
-    console.log(graphArray);
+    console.log(graphArray);//TODELETE
     console.log(graphArray[0]);
     console.log(graphArray[1]);
     console.log(graphArray[2]);
-    var IDs = [];
-    $( "#mainG" ).find( "g" ).each(function(){ IDs.push(this.id); });
+    var IDs = getGraphObjects("nodeOnly");
+
+    var CSVHeader = ["Ressource", "Media type", "Depends of", "Used by"];
+
+    var CSVContents = new Array(4);
+    var CSVContentsY = 0;
+    var CSVContentsX = 0;
+
+    var arrayRessource = [];
+
+    //CSVContents.push(CSVHeader);
+    //CSVContents.push(CSVHeader2);
     for(var i=0; i<IDs.length; i++){
-        console.log(IDs[i]);
+        console.log(IDs[i]);//TODELETE
     }
-    var arrayContents = [];
+    //IDs.length is the number of objects the graph have
+    for (i = 0; i < IDs.length; i++) {
+      CSVContents[i] = new Array(4);
+    }
+
     for(var i=0; i<IDs.length; i++){
+        CSVContentsX=0;
         //children at index 1 is service name
-        var ressourceName = $( "#"+IDs[i]+"").children()[1].innerHTML;
-        if(ressourceName){
-            console.log(ressourceName);
-            arrayContents.push(ressourceName);
+        if($( "#"+IDs[i]+"").children()[1].innerHTML){
+            var ressourceName = $( "#"+IDs[i]+"").children()[1].innerHTML;
         }
+        //children at index 2 is service name
+        if($( "#"+IDs[i]+"").children()[1].innerHTML){
+            var mediaType = $( "#"+IDs[i]+"").children()[2].innerHTML;
+        }
+        var dependsOf = getDependantObjects($( "#"+IDs[i]+"").attr("id"));
+        var usedBy = getUsedByObjects($( "#"+IDs[i]+"").attr("id"));
+
+        //Putting our data into CSVContents 2 dimmension array
+        if(ressourceName){
+            //console.log("push:" + ressourceName);//TODELETE
+            CSVContents[CSVContentsY][CSVContentsX] = ressourceName;
+            //console.log(CSVContents[CSVContentsY].length);//TODELETE
+        }
+        if(mediaType){
+            CSVContentsX++;
+            //console.log("push:" + mediaType);//TODELETE
+            CSVContents[CSVContentsY][CSVContentsX] = mediaType;
+        }
+        if(dependsOf){
+            CSVContentsX++;
+            //console.log("push:" + dependsOf);//TODELETE
+            CSVContents[CSVContentsY][CSVContentsX] = dependsOf;
+        }
+        //Next index
+        CSVContentsY++;
         //console.log($( "#"+IDs[i]+"").children()[1].innerHTML);
     }
+
+    //LOOP //TODELETE
+    for (i = 0; i < IDs.length; i++) {
+        console.log("CSVContents line "+i+" => ");//TODELETE
+        for (var y = 0; y < 4; y++) {
+            console.log("Obj"+y+":"+CSVContents[i][y]);
+        }
+    }
+    
 
     //CSV Generation
     /*var data = [["name1", "city1", "some other info"], ["name2", "city2", "more info"]];
@@ -903,6 +951,65 @@ function svgDownload(){
     window.open(encodedUri);*/
     
 }
+//MODIF Author: Adrien
+function getGraphObjects(type){ 
+    //console.log("START getGraphObjects-------------");//TODELETE
+    IDs=[];
+    $( "#mainG" ).find( "g" ).each(function(){
+        var groupType = $( "#"+this.id+"").attr("group");
+        if(type=="nodeOnly") // Here we push only node types object into return array
+        {
+            if(groupType=="node"){
+                IDs.push(this.id);
+            }
+        }
+        else if(type=="linkOnly") // Here linktype only
+        {
+            if(groupType=="link"){
+                IDs.push(this.id);
+            }
+        }
+        else // Here we push everything (nodes and link)
+        {
+            IDs.push(this.id);
+        }
+    });
+    //console.log("END getGraphObjects-------------");//TODELETE
+    return IDs;
+}
+//MODIF Author: Adrien
+function getDependantObjects(graphObject){
+    var dependantObjects=[];
+    var links = getGraphObjects("linkOnly");
+    for (var i = 0; i < links.length; i++) {
+        var nodes = $( "#"+links[i]+"").attr("nodes");
+        var nodes = nodes.split(";");
+        if(nodes[0]==graphObject)
+        {
+            dependantObjects.push(nodes[1]); //nodes[0] DEPENDS OF nodes[1]
+        }
+        //console.log($( "#"+links[i]+"").attr("associations"));
+    }
+    return dependantObjects;
+}
+//MODIF Author: Adrien
+function getUsedByObjects(graphObject){
+    var usedByObjects=[];
+    var links = getGraphObjects("linkOnly");
+    for (var i = 0; i < links.length; i++) {
+        var nodes = $( "#"+links[i]+"").attr("nodes");
+        var nodes = nodes.split(";");
+        console.log("NODE 1 =>" + nodes[0] +"NODE 2 =>"+ nodes[1]+"GRAPH OBJECT"+graphObject);//TODELETE
+        if(nodes[1]==graphObject)
+        {
+            usedByObjects.push(nodes[0]); //nodes[1] IS USED BY nodes[0]
+        }
+        //console.log($( "#"+links[i]+"").attr("associations"));
+    }
+    console.log(usedByObjects);//TODELETE
+    return usedByObjects;
+}
+
 /*
  * Function to get link relations.
  * @param d: data
