@@ -845,8 +845,7 @@ function showRelations(d){
  * Function to save current screen as a .png image file.
  */
  //MODIF
- //svgDownload en commentaire le temps de trouver comment mettre un bouton dans l'interface
-/*function svgDownload(){
+function svgDownloadBis(){
     $(graphSVG).clone().appendTo("#graph-capture");
     $(graphCaptureSVG).attr("id","cloned");
     var cssRules = {
@@ -866,15 +865,18 @@ function showRelations(d){
     $(graphCaptureSVG + " g").inlineStyler(cssRules);
     svgenie.save(document.getElementById("cloned"), { name:"graph.png" });
     $(graphCaptureSVG).remove();
-}*/
+}
 //MODIF Author: Adrien
 function svgDownload(){
-    console.log("New Download Function started (Adrie111n)");//TODELETE
+    createDownloadDivs();
+}
+//MODIF Author: Adrien
+function csvDownload(){
     var graphArray = $( "#mainG" ).find( "g" );//.attr('id');
     console.log(graphArray);//TODELETE
-    console.log(graphArray[0]);
-    console.log(graphArray[1]);
-    console.log(graphArray[2]);
+    for(var i=0; i<graphArray.length; i++){
+        console.log(graphArray[i]);
+    }
     var IDs = getGraphObjects("nodeOnly");
 
     var CSVHeader = ["Ressource", "Media type", "Depends of", "Used by"];
@@ -885,44 +887,39 @@ function svgDownload(){
 
     var arrayRessource = [];
 
-    //CSVContents.push(CSVHeader);
-    //CSVContents.push(CSVHeader2);
-    for(var i=0; i<IDs.length; i++){
-        console.log(IDs[i]);//TODELETE
-    }
-    //IDs.length is the number of objects the graph have
+    
+    //IDs.length is the number of node objects the graph have
     for (i = 0; i < IDs.length; i++) {
-      CSVContents[i] = new Array(4);
+        CSVContents[i] = new Array(4);
     }
 
     for(var i=0; i<IDs.length; i++){
         CSVContentsX=0;
-        //children at index 1 is service name
-        if($( "#"+IDs[i]+"").children()[1].innerHTML){
-            var ressourceName = $( "#"+IDs[i]+"").children()[1].innerHTML;
+        if(getNameByNode(IDs[i])){
+            var ressourceName = getNameByNode(IDs[i]);
         }
         //children at index 2 is service name
-        if($( "#"+IDs[i]+"").children()[1].innerHTML){
-            var mediaType = $( "#"+IDs[i]+"").children()[2].innerHTML;
+        if(getMediaByNode(IDs[i])){
+            var mediaType = getMediaByNode(IDs[i]);
         }
         var dependsOf = getDependantObjects($( "#"+IDs[i]+"").attr("id"));
         var usedBy = getUsedByObjects($( "#"+IDs[i]+"").attr("id"));
 
-        //Putting our data into CSVContents 2 dimmension array
+        //Putting our data into CSVContents 2 dimmensional array
         if(ressourceName){
-            //console.log("push:" + ressourceName);//TODELETE
             CSVContents[CSVContentsY][CSVContentsX] = ressourceName;
-            //console.log(CSVContents[CSVContentsY].length);//TODELETE
         }
         if(mediaType){
             CSVContentsX++;
-            //console.log("push:" + mediaType);//TODELETE
             CSVContents[CSVContentsY][CSVContentsX] = mediaType;
         }
         if(dependsOf){
             CSVContentsX++;
-            //console.log("push:" + dependsOf);//TODELETE
             CSVContents[CSVContentsY][CSVContentsX] = dependsOf;
+        }
+        if(usedBy){
+            CSVContentsX++;
+            CSVContents[CSVContentsY][CSVContentsX] = usedBy;
         }
         //Next index
         CSVContentsY++;
@@ -930,30 +927,52 @@ function svgDownload(){
     }
 
     //LOOP //TODELETE
+    console.log(CSVHeader[0]+";"+CSVHeader[1]+";"+CSVHeader[2]+";"+CSVHeader[3]);
     for (i = 0; i < IDs.length; i++) {
-        console.log("CSVContents line "+i+" => ");//TODELETE
-        for (var y = 0; y < 4; y++) {
-            console.log("Obj"+y+":"+CSVContents[i][y]);
-        }
-    }
+        console.log(CSVContents[i][0]+";"+CSVContents[i][1]+";"+CSVContents[i][2]+";"+CSVContents[i][3]);
+    }//END //TODELETE
     
 
     //CSV Generation
-    /*var data = [["name1", "city1", "some other info"], ["name2", "city2", "more info"]];
+    var data = [[CSVHeader[0], CSVHeader[1], CSVHeader[2], CSVHeader[3]]];
+    for (i = 0; i < IDs.length; i++) {
+        data.push([CSVContents[i][0], CSVContents[i][1], CSVContents[i][2], CSVContents[i][3]]);
+    }
     var csvContent = "data:text/csv;charset=utf-8,";
-    arrayContents.forEach(function(infoArray, index){
-
+    data.forEach(function(infoArray, index){
         dataString = infoArray.join(",");
-        csvContent += index < arrayContents.length ? dataString+ "\n" : dataString;
-
+        csvContent += index < data.length ? dataString+ "\n" : dataString;
     }); 
     var encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);*/
+    window.open(encodedUri);
     
 }
 //MODIF Author: Adrien
+function createDownloadDivs(){
+    //Grey Background opacity 30%
+    $("#page-content-wrapper").append('<div id="downloadGrey" style="position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.3;z-index:999;background-color:black;"></div>');
+    //Dialog Window for download options
+    $("#page-content-wrapper").append('<div id="downloadDialog" style="position:fixed;top:50%;left:37%;width:300px;height:100px;z-index:1000;background-color:#656666; color:#FFFFFF; text-align:center;"><p>Download as:</p></div>');
+    $("#downloadDialog").append('<button type="button" class="btn btn-default download" onclick="svgDownloadBis()" title="Save as PNG"><i class="fa fa-save" aria-hidden="true"></i> <span>PNG</span></button>');
+    $("#downloadDialog").append('<button type="button" class="btn btn-default download" onclick="csvDownload()" title="Save as CSV"><i class="fa fa-save" aria-hidden="true"></i> <span>CSV</span></button>');
+    $( "#downloadGrey" ).click(function() {
+      $( "#downloadGrey" ).remove();
+      $( "#downloadDialog" ).remove();
+    });
+}
+//MODIF Author: Adrien
+function getNameByNode(node){
+    //children at index 1 is ressource name
+    return $( "#"+node+"").children()[1].innerHTML;
+}
+
+//MODIF Author: Adrien
+function getMediaByNode(node){
+    //children at index 2 is media type
+    return $( "#"+node+"").children()[2].innerHTML;
+}
+//MODIF Author: Adrien
 function getGraphObjects(type){ 
-    //console.log("START getGraphObjects-------------");//TODELETE
     IDs=[];
     $( "#mainG" ).find( "g" ).each(function(){
         var groupType = $( "#"+this.id+"").attr("group");
@@ -974,7 +993,6 @@ function getGraphObjects(type){
             IDs.push(this.id);
         }
     });
-    //console.log("END getGraphObjects-------------");//TODELETE
     return IDs;
 }
 //MODIF Author: Adrien
@@ -986,7 +1004,7 @@ function getDependantObjects(graphObject){
         var nodes = nodes.split(";");
         if(nodes[0]==graphObject)
         {
-            dependantObjects.push(nodes[1]); //nodes[0] DEPENDS OF nodes[1]
+            dependantObjects.push(getNameByNode(nodes[1])); //nodes[0] DEPENDS OF nodes[1]
         }
         //console.log($( "#"+links[i]+"").attr("associations"));
     }
@@ -999,14 +1017,12 @@ function getUsedByObjects(graphObject){
     for (var i = 0; i < links.length; i++) {
         var nodes = $( "#"+links[i]+"").attr("nodes");
         var nodes = nodes.split(";");
-        console.log("NODE 1 =>" + nodes[0] +"NODE 2 =>"+ nodes[1]+"GRAPH OBJECT"+graphObject);//TODELETE
         if(nodes[1]==graphObject)
         {
-            usedByObjects.push(nodes[0]); //nodes[1] IS USED BY nodes[0]
+            usedByObjects.push(getNameByNode(nodes[0])); //nodes[1] IS USED BY nodes[0]
         }
         //console.log($( "#"+links[i]+"").attr("associations"));
     }
-    console.log(usedByObjects);//TODELETE
     return usedByObjects;
 }
 
