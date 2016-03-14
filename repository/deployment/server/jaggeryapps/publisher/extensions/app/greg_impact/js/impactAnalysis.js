@@ -38,6 +38,9 @@ var svgIconsFolder = "../extensions/app/greg_impact/images/svg/",
  *          - On search element drop list close function
  */
 $(document).ready(function() {
+    //MODIF
+    $("#page-content-wrapper").append('<div id="loadingBlack" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;background-color:#2E2E2E;"></div>');
+    $("#preLoader").appendTo($("#loadingBlack"));
 
     // Initializing search element
     $('#search').select2({
@@ -119,7 +122,6 @@ $(document).ready(function() {
     for (var i = 0; i < nodeCircles.length; i++) {
         setClickableTooltip('#' + nodeCircles[i].id , linkRelations(nodeCircles[i].__data__));
     }
-
 });
 
 /*
@@ -705,6 +707,9 @@ function tickCallback(){
     $(".download").attr("disabled", false);
     $(".filters").css("display", "inline-block");
     onload = false;
+    //MODIF: Adrien
+    $( "#loadingBlack" ).remove();
+    zoomFit();
 }
 
 /*
@@ -866,22 +871,23 @@ function svgDownloadBis(){
     svgenie.save(document.getElementById("cloned"), { name:"graph.png" });
     $(graphCaptureSVG).remove();
 }
+/*
+ * Function called from download button, calls another function to create download options dialog
+ */
 //MODIF Author: Adrien
 function svgDownload(){
     createDownloadDivs();
 }
+/*
+ * Function downloading the graph as a CSV file
+ */
 //MODIF Author: Adrien
 function csvDownload(){
     var graphArray = $( "#mainG" ).find( "g" );//.attr('id');
-    console.log(graphArray);//TODELETE
-    for(var i=0; i<graphArray.length; i++){
-        console.log(graphArray[i]);
-    }
     var IDs = getGraphObjects("nodeOnly");
-
-    var CSVHeader = ["Ressource", "Media type", "Depends of", "Used by"];
-
+    var CSVHeader = ["Ressource", "Media_Type", "Depends_Of", "Used_By"];
     var CSVContents = new Array(4);
+    var CSVContentsFlat = new Array(4);
     var CSVContentsY = 0;
     var CSVContentsX = 0;
 
@@ -891,6 +897,10 @@ function csvDownload(){
     //IDs.length is the number of node objects the graph have
     for (i = 0; i < IDs.length; i++) {
         CSVContents[i] = new Array(4);
+    }
+
+    for (i = 0; i < IDs.length; i++) {
+        CSVContentsFlat[i] = new Array(4);
     }
 
     for(var i=0; i<IDs.length; i++){
@@ -904,8 +914,46 @@ function csvDownload(){
         }
         var dependsOf = getDependantObjects($( "#"+IDs[i]+"").attr("id"));
         var usedBy = getUsedByObjects($( "#"+IDs[i]+"").attr("id"));
+        /*
+        //PUTTING DATA FOR CSV FILE
+
+        if(ressourceName){
+            CSVContentsFlat[CSVContentsY][CSVContentsX] = ressourceName;
+        }
+        if(mediaType){
+            CSVContentsX++;
+            CSVContentsFlat[CSVContentsY][CSVContentsX] = mediaType;
+        }
+        if(dependsOf){
+            CSVContentsX++;
+            for(var y=0; y<dependsOf.length; y++){
+                if(CSVContentsFlat[CSVContentsY][CSVContentsX]){
+                    CSVContentsFlat[CSVContentsY][CSVContentsX]=CSVContentsFlat[CSVContentsY][CSVContentsX]+";"+dependsOf[y];
+                }
+                else{
+                    CSVContentsFlat[CSVContentsY][CSVContentsX]=dependsOf[y];
+                }
+            }
+        }
+        if(usedBy){
+            CSVContentsX++;
+            for(var y=0; y<dependsOf.length; y++){
+                if(CSVContentsFlat[CSVContentsY][CSVContentsX]){
+                    CSVContentsFlat[CSVContentsY][CSVContentsX]=CSVContentsFlat[CSVContentsY][CSVContentsX]+";"+dependsOf[y];
+                }
+                else{
+                    CSVContentsFlat[CSVContentsY][CSVContentsX]=dependsOf[y];
+                }
+            }
+        }
+
+        console.log("FLAT ARRAY:"+CSVContentsFlat);*/
+
+        
+        //END DATA FOR CSV FILE
 
         //Putting our data into CSVContents 2 dimmensional array
+        
         if(ressourceName){
             CSVContents[CSVContentsY][CSVContentsX] = ressourceName;
         }
@@ -915,11 +963,29 @@ function csvDownload(){
         }
         if(dependsOf){
             CSVContentsX++;
-            CSVContents[CSVContentsY][CSVContentsX] = dependsOf;
+            var dependsOfString="";
+            for(var y=0; y<dependsOf.length; y++){
+                if(dependsOfString==""){
+                    dependsOfString=dependsOf[y];
+                }
+                else{
+                    dependsOfString=dependsOfString+";"+dependsOf[y];
+                }
+            }
+            CSVContents[CSVContentsY][CSVContentsX] = dependsOfString;
         }
         if(usedBy){
             CSVContentsX++;
-            CSVContents[CSVContentsY][CSVContentsX] = usedBy;
+            var usedByString="";
+            for(var y=0; y<usedBy.length; y++){
+                if(usedByString==""){
+                    usedByString=usedBy[y];
+                }
+                else{
+                    usedByString=usedByString+";"+usedBy[y];
+                }
+            }
+            CSVContents[CSVContentsY][CSVContentsX] = usedByString;
         }
         //Next index
         CSVContentsY++;
@@ -930,7 +996,8 @@ function csvDownload(){
     console.log(CSVHeader[0]+";"+CSVHeader[1]+";"+CSVHeader[2]+";"+CSVHeader[3]);
     for (i = 0; i < IDs.length; i++) {
         console.log(CSVContents[i][0]+";"+CSVContents[i][1]+";"+CSVContents[i][2]+";"+CSVContents[i][3]);
-    }//END //TODELETE
+    }
+    //END //TODELETE
     
 
     //CSV Generation
@@ -947,6 +1014,9 @@ function csvDownload(){
     window.open(encodedUri);
     
 }
+/*
+ * Function creating the download dialog
+ */
 //MODIF Author: Adrien
 function createDownloadDivs(){
     //Grey Background opacity 30%
@@ -960,17 +1030,25 @@ function createDownloadDivs(){
       $( "#downloadDialog" ).remove();
     });
 }
+/*
+ * Function getting the name of a specified node
+ */
 //MODIF Author: Adrien
 function getNameByNode(node){
     //children at index 1 is ressource name
     return $( "#"+node+"").children()[1].innerHTML;
 }
-
+/*
+ * Function getting the media of a specified node
+ */
 //MODIF Author: Adrien
 function getMediaByNode(node){
     //children at index 2 is media type
     return $( "#"+node+"").children()[2].innerHTML;
 }
+/*
+ * Function to get graph objects (either links or nodes or both), return an array of IDs of concerned objects
+ */
 //MODIF Author: Adrien
 function getGraphObjects(type){ 
     IDs=[];
@@ -995,6 +1073,9 @@ function getGraphObjects(type){
     });
     return IDs;
 }
+/*
+ * Function to get dependant objects of another graph object
+ */
 //MODIF Author: Adrien
 function getDependantObjects(graphObject){
     var dependantObjects=[];
@@ -1002,14 +1083,24 @@ function getDependantObjects(graphObject){
     for (var i = 0; i < links.length; i++) {
         var nodes = $( "#"+links[i]+"").attr("nodes");
         var nodes = nodes.split(";");
+        if($( "#"+links[i]+"").attr("associations")=="usedBy;depends"){
+            if(nodes[1]==graphObject)
+            {
+                dependantObjects.push(getNameByNode(nodes[0])); //nodes[1] DEPENDS OF nodes[0]
+            }
+        }
         if(nodes[0]==graphObject)
         {
-            dependantObjects.push(getNameByNode(nodes[1])); //nodes[0] DEPENDS OF nodes[1]
+            if($( "#"+links[i]+"").attr("associations")=="depends;usedBy"){
+                dependantObjects.push(getNameByNode(nodes[1])); //nodes[0] DEPENDS OF nodes[1]
+            }
         }
-        //console.log($( "#"+links[i]+"").attr("associations"));
     }
     return dependantObjects;
 }
+/*
+ * Function to get used by objects of another graph object
+ */
 //MODIF Author: Adrien
 function getUsedByObjects(graphObject){
     var usedByObjects=[];
@@ -1017,11 +1108,18 @@ function getUsedByObjects(graphObject){
     for (var i = 0; i < links.length; i++) {
         var nodes = $( "#"+links[i]+"").attr("nodes");
         var nodes = nodes.split(";");
+        if($( "#"+links[i]+"").attr("associations")=="usedBy;depends"){
+            if(nodes[0]==graphObject)
+            {
+                usedByObjects.push(getNameByNode(nodes[1])); //nodes[1] IS USED BY nodes[0]
+            }
+        }
         if(nodes[1]==graphObject)
         {
-            usedByObjects.push(getNameByNode(nodes[0])); //nodes[1] IS USED BY nodes[0]
+            if($( "#"+links[i]+"").attr("associations")=="depends;usedBy"){
+                usedByObjects.push(getNameByNode(nodes[0])); //nodes[0] IS USED BY nodes[1]
+            }
         }
-        //console.log($( "#"+links[i]+"").attr("associations"));
     }
     return usedByObjects;
 }
